@@ -6,11 +6,22 @@ import 'package:http/http.dart' as http;
 
 class Orders with ChangeNotifier {
   final List<Order> _orders = [];
+  String? _token;
+
+  updateToken(String? token) {
+    _token = token;
+  }
 
   List<Order> get orders => [..._orders];
 
   Future<void> fetchAndSetOrders() async {
-    final uri = Uri.https('shop-flutter-c082a-default-rtdb.firebaseio.com', '/orders.json');
+    final uri = Uri.https(
+      'shop-flutter-c082a-default-rtdb.firebaseio.com',
+      '/orders.json',
+      {
+        'auth': _token,
+      },
+    );
     final response = await http.get(uri);
     //print(jsonDecode(response.body.toString()));
     final List<Order> loaderOrders = [];
@@ -38,7 +49,13 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
-    final uri = Uri.https('shop-flutter-c082a-default-rtdb.firebaseio.com', '/orders.json');
+    final uri = Uri.https(
+      'shop-flutter-c082a-default-rtdb.firebaseio.com',
+      '/orders.json',
+      {
+        'auth': _token,
+      },
+    );
     final dateTimeNow = DateTime.now();
 
     final response = await http.post(
