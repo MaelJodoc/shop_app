@@ -63,13 +63,20 @@ class Products with ChangeNotifier {
     return _items.firstWhere((item) => item.id == id);
   }
 
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts({bool onlyUsersProducts = true}) async {
+    final queryParams = onlyUsersProducts
+        ? {
+            'auth': _token,
+            'orderBy': '"creatorId"',
+            'equalTo': '"$_userId"',
+          }
+        : {
+            'auth': _token,
+          };
     var uri = Uri.https(
       'shop-flutter-c082a-default-rtdb.firebaseio.com',
       '/products.json',
-      {
-        'auth': {_token}
-      },
+      queryParams,
     );
     log(uri.toString());
     try {
@@ -80,9 +87,7 @@ class Products with ChangeNotifier {
       uri = Uri.https(
         'shop-flutter-c082a-default-rtdb.firebaseio.com',
         '/userFavorites/$_userId/.json',
-        {
-          'auth': {_token}
-        },
+        {'auth': _token},
       );
       final responseFavs = await http.get(uri);
       final favsMap = json.decode(responseFavs.body) as Map<String, dynamic>?;
@@ -135,6 +140,7 @@ class Products with ChangeNotifier {
             'price': product.price.toStringAsFixed(2),
             'imageUrl': product.imageUrl,
             //'isFavorite': product.isFavorite,
+            'creatorId': _userId,
           },
         ),
       );

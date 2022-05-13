@@ -18,7 +18,7 @@ class UserProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Products products = Provider.of<Products>(context);
+    final Products products = Provider.of<Products>(context)..fetchAndSetProducts();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Products'),
